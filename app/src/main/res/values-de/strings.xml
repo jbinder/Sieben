@@ -68,6 +68,8 @@
 
     <string name="action_exercises">Übungen</string>
     <string name="action_exercises_summary">Wähle die Übungen aus, die du machen willst.</string>
+    <string name="action_no_audio_overlap">Kein überlappender Sound</string>
+    <string name="action_no_audio_overlap_summary">Hintergrundmusik während Sprachanweisungen und Signalen pausieren?</string>
 
     //Snackbar
     <string name="sn_pause">Eine kurze Pause …</string>

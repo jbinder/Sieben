@@ -63,6 +63,9 @@
     <string name="action_exercises">Exercices</string>
     <string name="action_exercises_summary">Choisissez les exercices que vous souhaitez pratiquer.</string>
 
+    <string name="action_no_audio_overlap">No overlapping audio</string>
+    <string name="action_no_audio_overlap_summary">Pause background audio during voice commands and whistle?</string>
+
     //Snackbar
     <string name="sn_pause">Une courte pause …</string>
     <string name="sn_weiter">… Recommençons !</string>

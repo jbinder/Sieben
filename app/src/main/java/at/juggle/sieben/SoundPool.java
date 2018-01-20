@@ -5,6 +5,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 
 import de.baumann.sieben.R;
+import de.baumann.sieben.helper.SoundManager;
 
 import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT;
 import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK;
@@ -19,38 +20,45 @@ public class SoundPool {
 
     public static void playWhistle(Context context) {
         final MediaPlayer player = MediaPlayer.create(context, R.raw.whistle_blow_cc0);
-        final AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        final int maxVolume = am.getStreamMaxVolume(AudioManager.STREAM_NOTIFICATION);
-        final AudioManager.OnAudioFocusChangeListener afChangeListener = CreateOnAudioFocusChangeListener(player, maxVolume);
+        final SoundManager sm = new SoundManager(context) {
+            @Override
+            public void onPlay() {
+                player.start();
+                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    public void onCompletion(MediaPlayer mp) {
+                        setDone();
+                    }
+                });
+            }
 
-        int result = am.requestAudioFocus(afChangeListener,
-                AudioManager.STREAM_NOTIFICATION,
-                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            player.start();
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                public void onCompletion(MediaPlayer mp) {
-                    am.abandonAudioFocus(afChangeListener);
-                }
-            });
-        }
+            @Override
+            public void onStop() {}
+
+            @Override
+            protected AudioManager.OnAudioFocusChangeListener onCreateOnAudioFocusChangeListener(AudioManager audioManager) {
+                return CreateOnAudioFocusChangeListener(player, audioManager);
+            }
+        };
+        sm.play();
     }
 
-    private static AudioManager.OnAudioFocusChangeListener CreateOnAudioFocusChangeListener(final MediaPlayer player, final int maxVolume) {
+    private static AudioManager.OnAudioFocusChangeListener CreateOnAudioFocusChangeListener(final MediaPlayer player, AudioManager audioManager) {
+        // currently whistle and tts might be played at the same time by the app, so don't interrupt the whistle
         return new AudioManager.OnAudioFocusChangeListener() {
             @Override
             public void onAudioFocusChange(int focusChange) {
                 if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
                     player.stop();
                 } else if (focusChange == AUDIOFOCUS_LOSS_TRANSIENT) {
-                    player.pause();
+                    // player.pause();
                 } else if (focusChange == AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                    player.setVolume(maxVolume / 2, maxVolume / 2);
+                    // player.pause();
                 } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                    /*
                     if (player.getCurrentPosition() < player.getDuration() && player.getCurrentPosition() > 0) {
                         player.start();
                     }
-                    player.setVolume(maxVolume, maxVolume);
+                    */
                 }
             }
         };

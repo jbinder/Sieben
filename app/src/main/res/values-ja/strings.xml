@@ -118,6 +118,9 @@
 
     <string name="action_reset">Reset durations</string>
 
+    <string name="action_no_audio_overlap">No overlapping audio</string>
+    <string name="action_no_audio_overlap_summary">Pause background audio during voice commands and whistle?</string>
+
     //Statistics
     <string name="stat_time">Overall time:</string>
     <string name="stat_number">Count:</string>

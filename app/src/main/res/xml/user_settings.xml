@@ -18,6 +18,13 @@
             android:key="beep"
             android:defaultValue="true" />
 
+        <CheckBoxPreference
+            android:title="@string/action_no_audio_overlap"
+            android:icon="@drawable/volume_high"
+            android:summary="@string/action_no_audio_overlap_summary"
+            android:key="no_audio_overlap"
+            android:defaultValue="false" />
+
         <Preference
             android:title="@string/action_duration"
             android:icon="@drawable/timer_sand"

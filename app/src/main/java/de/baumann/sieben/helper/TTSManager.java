@@ -59,46 +59,45 @@ public class TTSManager {
 //    }
 // --Commented out by Inspection STOP (28.03.16 22:50)
 
-    public void initQueue(String text) {
+    public void initQueue(final String text) {
         if (isLoaded) {
-            final android.media.AudioManager am = (android.media.AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-            final int maxVolume = am.getStreamMaxVolume(android.media.AudioManager.STREAM_NOTIFICATION);
-            final android.media.AudioManager.OnAudioFocusChangeListener afChangeListener = CreateOnAudioFocusChangeListener(maxVolume);
-            mTts.stop();
-            int result = am.requestAudioFocus(afChangeListener,
-                    android.media.AudioManager.STREAM_NOTIFICATION,
-                    android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-            if (result == android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                String utteranceId = "tts-message";
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    mTts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
-                } else {
-                    HashMap<String, String> map = new HashMap<>();
-                    map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId);
-                    //noinspection deprecation
-                    mTts.speak(text, TextToSpeech.QUEUE_FLUSH, map);
+            final SoundManager sm = new SoundManager(context) {
+                @Override
+                public void onPlay() {
+                    String utteranceId = "tts-message";
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        mTts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+                    } else {
+                        HashMap<String, String> map = new HashMap<>();
+                        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId);
+                        //noinspection deprecation
+                        mTts.speak(text, TextToSpeech.QUEUE_FLUSH, map);
+                    }
+                    mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                        public void onStart(String s) {}
+                        public void onDone(String s) { setDone(); }
+                        public void onError(String s) {}
+                    });
                 }
-                mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                    @Override
-                    public void onStart(String s) {
-                    }
 
-                    @Override
-                    public void onDone(String s) {
-                        am.abandonAudioFocus(afChangeListener);
-                    }
+                @Override
+                public void onStop() {
+                    mTts.stop();
+                }
 
-                    @Override
-                    public void onError(String s) {
-                    }
-                });
-            }
+                @Override
+                protected AudioManager.OnAudioFocusChangeListener onCreateOnAudioFocusChangeListener(AudioManager audioManager) {
+                    return CreateOnAudioFocusChangeListener();
+                }
+            };
+
+            sm.play();
         }
         else
             Log.e("error", "TTS Not Initialized");
     }
 
-    private AudioManager.OnAudioFocusChangeListener CreateOnAudioFocusChangeListener(final int maxVolume) {
+    private AudioManager.OnAudioFocusChangeListener CreateOnAudioFocusChangeListener() {
         return new AudioManager.OnAudioFocusChangeListener() {
             @Override
             public void onAudioFocusChange(int focusChange) {
