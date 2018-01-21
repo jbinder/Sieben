@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +17,6 @@ import at.juggle.sieben.SoundPool;
 import de.baumann.sieben.helper.Activity_intro;
 import de.baumann.sieben.helper.CountDownTimer;
 import de.baumann.sieben.helper.OnSwipeTouchListener;
-import de.baumann.sieben.helper.TTSManager;
 import de.baumann.sieben.helper.UserSettingsActivity;
 import de.baumann.sieben.pause.Pause;
 import de.baumann.sieben.pause.Pause10;
@@ -45,12 +43,11 @@ import de.baumann.sieben.workouts.MainActivity8;
 import de.baumann.sieben.workouts.MainActivity9;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends ActivityBase {
 
     private TextView textView;
     private TextView textView2;
     private ProgressBar progressBar;
-    private TTSManager ttsManager = null;
     private ImageView imageView;
 
     private boolean isPaused = false;
@@ -120,10 +117,6 @@ public class MainActivity extends AppCompatActivity {
         textView2 = (TextView) this.findViewById(R.id.timer2);
         assert textView2 != null;
         textView2.setText(R.string.start);
-
-
-        ttsManager = new TTSManager();
-        ttsManager.init(this);
 
         imageView.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
             final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);

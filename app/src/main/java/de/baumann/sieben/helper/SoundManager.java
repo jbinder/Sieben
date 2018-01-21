@@ -9,6 +9,7 @@ public abstract class SoundManager {
     private boolean requestFocus;
     private android.media.AudioManager audioManager;
     private int contextHashCode;
+    private int numSoundsPlaying = 0;
 
     protected SoundManager(Context context) {
         contextHashCode = context.hashCode();
@@ -22,12 +23,12 @@ public abstract class SoundManager {
     protected abstract AudioManager.OnAudioFocusChangeListener onCreateOnAudioFocusChangeListener(AudioManager audioManager);
 
     public void play() {
-        if (!requestFocus) {
+        ++numSoundsPlaying;
+        if (!requestFocus || numSoundsPlaying > 1) {
             onPlay();
             return;
         }
 
-        stop();
         int result = audioManager.requestAudioFocus(focusChangeListener,
                 android.media.AudioManager.STREAM_NOTIFICATION,
                 android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
@@ -42,10 +43,14 @@ public abstract class SoundManager {
     }
 
     public void setDone() {
+        --numSoundsPlaying;
+        numSoundsPlaying = numSoundsPlaying < 0 ? 0 : numSoundsPlaying;
         if (!requestFocus) {
             return;
         }
-        audioManager.abandonAudioFocus(focusChangeListener);
+        if (numSoundsPlaying < 1) {
+            audioManager.abandonAudioFocus(focusChangeListener);
+        }
     }
 
     public int getContextHashCode() {

@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import at.juggle.sieben.SoundPool;
+import de.baumann.sieben.ActivityBase;
 import de.baumann.sieben.MainActivity;
 import de.baumann.sieben.R;
 import de.baumann.sieben.helper.CountDownTimer;
@@ -24,11 +25,10 @@ import de.baumann.sieben.helper.UserSettingsActivity;
 import de.baumann.sieben.workouts.MainActivity8;
 
 
-public class Pause7 extends AppCompatActivity {
+public class Pause7 extends ActivityBase {
 
     private TextView textView;
     private ProgressBar progressBar;
-    private TTSManager ttsManager = null;
     private ImageView imageView;
 
     private boolean isPaused = false;
@@ -62,9 +62,6 @@ public class Pause7 extends AppCompatActivity {
         progressBar.setRotation(180);
 
         textView = (TextView) this.findViewById(R.id.timer);
-
-        ttsManager = new TTSManager();
-        ttsManager.init(this);
 
         long millisInFuture = duration * 1000;
         long countDownInterval = 100;

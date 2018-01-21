@@ -33,6 +33,12 @@ public class TTSManager {
         soundManager = createSoundManager();
     }
 
+    public void deinit() {
+        if (mTts == null) return;
+        mTts.stop();
+        mTts.shutdown();
+    }
+
     private final TextToSpeech.OnInitListener onInitListener = new TextToSpeech.OnInitListener() {
         @Override
         public void onInit(int status) {
@@ -94,7 +100,6 @@ public class TTSManager {
 
             @Override
             public void onStop() {
-                mTts.stop();
             }
 
             @Override
@@ -105,11 +110,12 @@ public class TTSManager {
     }
 
     private AudioManager.OnAudioFocusChangeListener CreateOnAudioFocusChangeListener() {
+        // currently whistle and tts might be played at the same time by the app, so don't interrupt the tts
         return new AudioManager.OnAudioFocusChangeListener() {
             @Override
             public void onAudioFocusChange(int focusChange) {
                 if (focusChange == AudioManager.AUDIOFOCUS_LOSS || focusChange == AUDIOFOCUS_LOSS_TRANSIENT || focusChange == AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                    mTts.stop();
+                    // mTts.stop();
                 }
             }
         };
