@@ -8,8 +8,10 @@ public abstract class SoundManager {
     private AudioManager.OnAudioFocusChangeListener focusChangeListener;
     private boolean requestFocus;
     private android.media.AudioManager audioManager;
+    private int contextHashCode;
 
     protected SoundManager(Context context) {
+        contextHashCode = context.hashCode();
         audioManager = (android.media.AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         this.focusChangeListener = onCreateOnAudioFocusChangeListener(audioManager);
         requestFocus = PreferenceManager.getDefaultSharedPreferences(context).getBoolean ("no_audio_overlap", false);
@@ -25,7 +27,7 @@ public abstract class SoundManager {
             return;
         }
 
-        onStop(); // ensure to stop still running sounds
+        stop();
         int result = audioManager.requestAudioFocus(focusChangeListener,
                 android.media.AudioManager.STREAM_NOTIFICATION,
                 android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
@@ -34,10 +36,19 @@ public abstract class SoundManager {
         }
     }
 
+    public void stop() {
+        onStop();
+        setDone();
+    }
+
     public void setDone() {
         if (!requestFocus) {
             return;
         }
         audioManager.abandonAudioFocus(focusChangeListener);
+    }
+
+    public int getContextHashCode() {
+        return contextHashCode;
     }
 }

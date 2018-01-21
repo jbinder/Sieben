@@ -17,10 +17,22 @@ import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK;
 public class SoundPool {
     @SuppressWarnings("unused")
     public static int sndWhistle = R.raw.whistle_blow_cc0;
+    public static SoundManager currentSoundManager = null;
 
     public static void playWhistle(Context context) {
+        getSoundManager(context).play();
+    }
+
+    private static SoundManager getSoundManager(final Context context) {
+        if (currentSoundManager != null) {
+            currentSoundManager.stop();
+            if (currentSoundManager.getContextHashCode() == context.hashCode()) {
+                return currentSoundManager;
+            }
+        }
+
         final MediaPlayer player = MediaPlayer.create(context, R.raw.whistle_blow_cc0);
-        final SoundManager sm = new SoundManager(context) {
+        return new SoundManager(context) {
             @Override
             public void onPlay() {
                 player.start();
@@ -39,7 +51,6 @@ public class SoundPool {
                 return CreateOnAudioFocusChangeListener(player, audioManager);
             }
         };
-        sm.play();
     }
 
     private static AudioManager.OnAudioFocusChangeListener CreateOnAudioFocusChangeListener(final MediaPlayer player, AudioManager audioManager) {
